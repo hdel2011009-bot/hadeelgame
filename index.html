@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سباق الضرب - مدرسة الوجيز النموذجية</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(160deg,#4facfe,#7b5cff 55%,#ff6ec4);color:#fff;text-align:center}
+.wrap{max-width:720px;margin:auto;padding:14px}
+.school{background:rgba(255,255,255,.2);border-radius:18px;padding:8px;font-weight:bold;font-size:15px}
+h1{font-size:30px;margin:12px 0 4px;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.card{background:#fff;color:#2b2b4a;border-radius:24px;padding:18px;margin:12px 0;box-shadow:0 10px 0 rgba(0,0,0,.18)}
+.btn{border:0;border-radius:18px;padding:14px 28px;font-size:22px;font-weight:bold;color:#fff;background:linear-gradient(#ffb300,#ff6d00);box-shadow:0 6px 0 #b34700;cursor:pointer;font-family:inherit}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b34700}
+#nm{width:100%;max-width:340px;font-size:22px;padding:12px;border-radius:14px;border:3px solid #7b5cff;text-align:center;font-family:inherit;margin:8px 0 16px}
+.track{direction:ltr;background:#444;border-radius:16px;padding:8px 0;position:relative;border:4px solid #ffd54f}
+.lane{height:54px;position:relative;margin:4px 0;background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(255,255,255,.35) 30px 50px) center/100% 3px no-repeat}
+.car{position:absolute;top:2px;font-size:42px;transform:scaleX(-1);transition:left .9s cubic-bezier(.3,1.4,.5,1);left:0}
+.flag{position:absolute;right:6px;top:0;bottom:0;width:24px;background:repeating-conic-gradient(#fff 0 25%,#111 0 50%) 0 0/12px 12px;border-radius:4px}
+.tag{position:absolute;left:6px;top:-2px;font-size:11px;color:#fff;z-index:2}
+.info{display:flex;justify-content:space-between;font-weight:bold;margin:8px 4px}
+.bar{height:12px;background:rgba(255,255,255,.3);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffe53b,#ff2525);transition:width .5s}
+.lvl{display:inline-block;background:#7b5cff;color:#fff;border-radius:12px;padding:3px 14px;font-size:14px}
+.q{direction:ltr;font-size:44px;font-weight:bold;margin:12px 0;color:#d81b60}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{direction:ltr;border:0;border-radius:16px;padding:16px 4px;font-size:28px;font-weight:bold;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.opt:nth-child(1){background:#00bfa5}.opt:nth-child(2){background:#2979ff}.opt:nth-child(3){background:#ff9100}.opt:nth-child(4){background:#e040fb}
+.opt.ok{background:#00c853!important;animation:pop .5s}.opt.no{background:#f44336!important;animation:shake .4s}
+@keyframes pop{50%{transform:scale(1.12)}}@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.hide{display:none}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:5}
+.end{font-size:70px;animation:pop 1.2s infinite}
+.fb{min-height:36px;font-size:22px;font-weight:bold;margin-top:12px}
+.fb.g{color:#00a152;animation:pop .6s}.fb.b{color:#e65100}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="wrap">
+  <div class="school">🏫 مدرسة الوجيز النموذجية • الصف الرابع • المعلمة هديل</div>
+  <h1>🏁 سباق الضرب 🏎️</h1>
+
+  <div id="start" class="card">
+    <div style="font-size:64px">🏎️💨</div>
+    <h2>ضرب الأعداد في 10 ، 100 ، 1000</h2>
+    <p style="font-size:18px">أجب عن 15 مسألة بشكل صحيح لتتقدم سيارتك وتفوز بالسباق!<br>أجب عن 10 مسائل صحيحة أو أكثر لتصبح بطل السباق 🏆</p>
+    <div style="font-size:18px;font-weight:bold">✏️ اكتب اسمك يا بطل:</div>
+    <input id="nm" maxlength="20" placeholder="اسم الطالب / الطالبة" autocomplete="off"><br>
+    <button class="btn" onclick="startGame()">🚦 ابدأ السباق</button>
+  </div>
+
+  <div id="game" class="hide">
+    <div class="track">
+      <div class="flag"></div>
+      <div class="lane"><span class="tag" id="tagMe">YOU</span><div class="car" id="me">🏎️</div></div>
+      <div class="lane"><span class="tag">RIVAL</span><div class="car" id="rv" style="filter:hue-rotate(160deg)">🚗</div></div>
+    </div>
+    <div class="info"><span>⭐ <b id="sc">0</b></span><span id="who"></span><span id="no">1 / 15</span></div>
+    <div class="bar"><i id="pb"></i></div>
+    <div class="card">
+      <span class="lvl" id="lv"></span>
+      <div class="q" id="qt"></div>
+      <div class="opts" id="op"></div>
+      <div class="fb" id="fb"></div>
+    </div>
+  </div>
+
+  <div id="end" class="card hide">
+    <div class="end" id="eIcon"></div>
+    <h2 id="eTitle"></h2>
+    <p id="eMsg" style="font-size:19px"></p>
+    <div style="font-size:34px" id="eStars"></div>
+    <button class="btn" onclick="show('start')">🔁 سباق جديد</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const fmt=n=>n.toLocaleString('en-US');
+let Q=[],i=0,score=0,wrong=0,lock=false,name='بطل';
+
+// ---------- عبارات التشجيع (عدّليها كما تحبين) ----------
+const GOOD=[
+ n=>`🌟 مذهل يا ${n}!`, n=>`🔥 رائع يا ${n}!`, n=>`👏 ممتاز يا ${n}!`,
+ n=>`🚀 عبقري يا ${n}!`, n=>`🏆 أحسنت يا ${n}!`, n=>`💎 إجابة خارقة يا ${n}!`,
+ n=>`⭐ Amazing ${n}!`, n=>`🎉 Great job ${n}!`, n=>`💪 أنت بطل يا ${n}!`
+];
+const BAD=[
+ n=>`💪 حاول مرة أخرى يا ${n}!`, n=>`🌈 لا بأس يا ${n}، أنت تستطيع!`,
+ n=>`🙂 قريب جداً يا ${n}، لا تستسلم!`, n=>`🌟 المحاولة تصنع الأبطال يا ${n}!`,
+ n=>`🔁 Try again ${n}!`
+];
+
+// ---------- Questions ----------
+function build(){
+  Q=[];
+  [10,100,1000].forEach((m,l)=>{
+    for(let k=0;k<5;k++){
+      const f=k<2?m:rnd(2,9)*m;
+      const a=k<3?rnd(2,9):rnd(11,60);
+      const ans=a*f, set=new Set([ans]);
+      [ans*10,ans/10,(a+1)*f,(a-1)*f,(a+2)*f].forEach(d=>{
+        if(Number.isInteger(d)&&d>0&&set.size<4&&Math.random()<.8)set.add(d)});
+      while(set.size<4)set.add(ans*(rnd(2,9)));
+      Q.push({t:`${a} × ${fmt(f)} = ?`,ans,opts:[...set].sort(()=>Math.random()-.5),l});
+    }
+  });
+}
+
+// ---------- Sound ----------
+let AC;
+function note(f,t,d,type='triangle',v=.25){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.value=f;o.connect(g);g.connect(AC.destination);
+  const s=AC.currentTime+t;
+  g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+.02);g.gain.exponentialRampToValueAtTime(.001,s+d);
+  o.start(s);o.stop(s+d+.05);
+}
+function play(seq,gap=.18,type){seq.forEach((f,k)=>f&&note(f,k*gap,gap*1.6,type))}
+const C=261.6,D=293.7,E=329.6,G=392,A=440,C2=523.3,E2=659.3,G2=784;
+const sfx={
+ ok:()=>play([E2,G2],.1,'square'),
+ no:()=>play([220,170],.15,'sawtooth'),
+ win:()=>play([C,E,G,C2,0,G,C2,E2,G2,0,E2,G2,C2*2,0,C2*2,0,C2*2],.16),
+ lose:()=>play([E,G,A,G,E,G,C2,0,A,C2,E2,D*2,C2,G,C2],.22)
+};
+
+// ---------- Fireworks ----------
+const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf=0,until=0;
+function size(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',size);size();
+function burst(x,y){
+  const h=rnd(0,360);
+  for(let k=0;k<60;k++){const a=Math.random()*6.28,s=Math.random()*6+2;
+    P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:70+rnd(0,30),c:`hsl(${h+rnd(-40,40)},100%,60%)`})}
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  if(Date.now()<until&&Math.random()<.08)burst(rnd(60,cv.width-60),rnd(60,cv.height*.55));
+  P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.07;p.vx*=.99;p.life--;
+    cx.globalAlpha=Math.max(p.life/70,0);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,3,0,6.28);cx.fill()});
+  P=P.filter(p=>p.life>0);
+  if(P.length||Date.now()<until)raf=requestAnimationFrame(loop);else cx.clearRect(0,0,cv.width,cv.height);
+}
+function fireworks(ms){until=Date.now()+ms;cancelAnimationFrame(raf);loop();for(let k=0;k<4;k++)setTimeout(()=>burst(rnd(80,cv.width-80),rnd(80,300)),k*250)}
+
+// ---------- Game ----------
+function show(id){['start','game','end'].forEach(x=>$(x).classList.toggle('hide',x!==id))}
+function startGame(){
+  name=$('nm').value.trim()||'بطل';
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume();
+  $('who').textContent='🧒 '+name;
+  build();i=0;score=0;wrong=0;show('game');move();ask();
+}
+function move(){
+  const max=()=>$('me').parentElement.clientWidth-72;
+  $('me').style.left=(score/15*max())+'px';
+  $('rv').style.left=(wrong/15*max())+'px';
+  $('sc').textContent=score;
+}
+const names=['المستوى الأول: × 10 🟢','المستوى الثاني: × 100 🟡','المستوى الثالث: × 1000 🔴'];
+function ask(){
+  lock=false;const q=Q[i];
+  $('qt').textContent=q.t;$('lv').textContent=names[q.l];
+  $('no').textContent=(i+1)+' / 15';$('pb').style.width=(i/15*100)+'%';
+  $('fb').textContent='';$('fb').className='fb';
+  $('op').innerHTML='';
+  q.opts.forEach(v=>{const b=document.createElement('button');b.className='opt';b.textContent=fmt(v);b.onclick=()=>pick(b,v);$('op').appendChild(b)});
+}
+function pick(btn,v){
+  if(lock)return;lock=true;const q=Q[i];
+  if(v===q.ans){btn.classList.add('ok');score++;sfx.ok();
+    $('fb').textContent=GOOD[rnd(0,GOOD.length-1)](name);$('fb').className='fb g';
+    burst(innerWidth/2,200);fireworks(300);
+  }else{btn.classList.add('no');wrong++;sfx.no();
+    [...$('op').children].forEach(b=>{if(b.textContent===fmt(q.ans))b.classList.add('ok')});
+    $('fb').textContent=BAD[rnd(0,BAD.length-1)](name)+' (الجواب الصحيح بالأخضر)';$('fb').className='fb b';}
+  move();
+  setTimeout(()=>{i++;i<15?ask():finish()},1600);
+}
+function finish(){
+  $('pb').style.width='100%';
+  const win=score>=10;
+  $('eIcon').textContent=win?'🏆':'💪';
+  $('eTitle').textContent=win?`مبروك يا ${name}! أنت بطل السباق! 🎉`:`سباق رائع يا ${name}! حاول مرة أخرى 🌈`;
+  $('eMsg').innerHTML=`نتيجتك: <b>${score}</b> من 15<br>`+(win?`أحسنت يا ${name}! أنت نجم الصف الرابع ⭐`:`أنت قريب جداً من الفوز يا ${name}، التدريب يصنع الأبطال! 🚀`);
+  $('eStars').textContent='⭐'.repeat(Math.ceil(score/5))||'🌱';
+  show('end');
+  win?sfx.win():sfx.lose();
+  fireworks(win?6000:3500);
+}
+</script>
+</body>
+</html>
